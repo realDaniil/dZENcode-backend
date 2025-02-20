@@ -3,6 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import bodyParser from 'body-parser';
+import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
 import { router } from './routes/index.js';
 
@@ -19,8 +20,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/', router);
 
-const WS_PORT = process.env.WS_PORT || 5001;
-const wss = new WebSocketServer({ port: WS_PORT });
+const server = createServer(app);
+
+const wss = new WebSocketServer({ server });
+
 let connectedUsers = 0;
 
 wss.on('connection', (ws) => {
@@ -43,6 +46,6 @@ wss.on('connection', (ws) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+server.listen(PORT, () => {
+  console.log(`Server with WS is running on http://localhost:${PORT}`);
 });
